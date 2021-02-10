@@ -14,10 +14,14 @@ def home():
     user_name = request.args.get("userName", "unknown")
     return render_template('main.html', user=user_name)
 
-@app.route('/people')
+@app.route('/people', methods=['GET'])
 def people():
     with db.get_db_cursor() as cur:
         cur.execute("SELECT * FROM person;")
         names = [record[1] for record in cur]
 
         return render_template("people.html", names=names)
+
+@app.route('/people', methods=['POST'])
+def new_person():
+    return "you should probably program this"
