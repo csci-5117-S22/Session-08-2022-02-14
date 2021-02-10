@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request, g, redirect, url_for, jsonify
 
 import db
 
@@ -11,8 +11,7 @@ def initialize():
 
 @app.route('/')
 def home():
-    user_name = request.args.get("userName", "unknown")
-    return render_template('main.html', user=user_name)
+    return render_template('main.html')
 
 @app.route('/people', methods=['GET'])
 def people():
@@ -24,4 +23,17 @@ def people():
 
 @app.route('/people', methods=['POST'])
 def new_person():
-    return "you should probably program this"
+    name = request.form.get("name", "unknown name")
+    app.logger.info("adding new friend %s", name)
+    with db.get_db_cursor(commit=True) as cur:
+        cur.execute("insert into person (name) values (%s);", (name,))    
+    return redirect(url_for("people"))
+
+@app.route("/api/whatev.json")
+def api():
+    data = {'daniel': 'low caff',
+    'willow': {
+        'type':'cat',
+        'size': 7
+    }}
+    return jsonify(data)
